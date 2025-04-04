@@ -12,9 +12,9 @@ export class UuidClient {
   /**
    * UuidClientのコンストラクタ
    * @param serverCommand - MCPサーバーを起動するコマンド
-   * @param args - サーバーコマンドの引数
+   * @param serverArgs - サーバーコマンドの引数
    */
-  constructor(private serverCommand: string = 'echo', private args: string[] = ['MCPサーバーが指定されていません']) {
+  constructor(private serverCommand: string = 'echo', private serverArgs: string[] = ['MCPサーバーが指定されていません']) {
     this.client = new Client(
       { name: 'uuid-client', version: '1.0.0' },
       { capabilities: { resources: {}, tools: {}, prompts: {} }}
@@ -33,7 +33,7 @@ export class UuidClient {
     try {
       const transport = new StdioClientTransport({
         command: this.serverCommand,
-        args: this.args
+        args: this.serverArgs
       });
 
       await this.client.connect(transport);
@@ -51,5 +51,18 @@ export class UuidClient {
    */
   generateUuid(): string {
     return uuidv4();
+  }
+  
+  /**
+   * 指定された回数のUUIDを生成して返す
+   * @param count - 生成するUUIDの数
+   * @returns 生成されたUUIDの配列
+   */
+  generateUuids(count: number): string[] {
+    const uuids: string[] = [];
+    for (let i = 0; i < count; i++) {
+      uuids.push(this.generateUuid());
+    }
+    return uuids;
   }
 }
