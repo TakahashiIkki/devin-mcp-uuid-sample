@@ -1,6 +1,14 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+
+/**
+ * UUIDのバージョン情報
+ */
+export interface UuidVersionInfo {
+  isValid: boolean;
+  version: number | null;
+}
 
 /**
  * UUID生成のためのMCPクライアントクラス
@@ -64,5 +72,33 @@ export class UuidClient {
       uuids.push(this.generateUuid());
     }
     return uuids;
+  }
+
+  /**
+   * UUIDのバージョンを判定する
+   * @param uuid - 判定するUUID文字列
+   * @returns UUIDのバージョン情報
+   */
+  detectUuidVersion(uuid: string): UuidVersionInfo {
+    if (!uuidValidate(uuid)) {
+      return { isValid: false, version: null };
+    }
+
+    const versionChar = uuid.charAt(14);
+    let version: number | null = null;
+
+    if (versionChar === '1') {
+      version = 1;
+    } else if (versionChar === '2') {
+      version = 2;
+    } else if (versionChar === '3') {
+      version = 3;
+    } else if (versionChar === '4') {
+      version = 4;
+    } else if (versionChar === '5') {
+      version = 5;
+    }
+
+    return { isValid: true, version };
   }
 }
