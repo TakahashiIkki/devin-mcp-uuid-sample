@@ -1,6 +1,6 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
+import { v4 as uuidv4, validate as uuidValidate, version as uuidVersion } from 'uuid';
 
 /**
  * UUIDのバージョン情報
@@ -84,21 +84,8 @@ export class UuidClient {
       return { isValid: false, version: null };
     }
 
-    const versionChar = uuid.charAt(14);
-    let version: number | null = null;
-
-    if (versionChar === '1') {
-      version = 1;
-    } else if (versionChar === '2') {
-      version = 2;
-    } else if (versionChar === '3') {
-      version = 3;
-    } else if (versionChar === '4') {
-      version = 4;
-    } else if (versionChar === '5') {
-      version = 5;
-    }
-
+    const version = uuidVersion(uuid);
+    
     return { isValid: true, version };
   }
 }
