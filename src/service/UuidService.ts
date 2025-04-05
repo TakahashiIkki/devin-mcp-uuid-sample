@@ -9,9 +9,9 @@ export interface UuidVersionInfo {
 }
 
 /**
- * UUID生成と検証のためのサービスクラス
+ * UUID生成と検証のためのAPIクラス
  */
-export class UuidService {
+export class UuidApi {
   /**
    * UUIDを生成して返す
    * @returns 生成されたUUID

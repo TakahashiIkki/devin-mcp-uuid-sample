@@ -12,9 +12,9 @@ interface UuidVersionInfo {
 }
 
 /**
- * UUID生成と検証のためのサービスクラス
+ * UUID生成と検証のためのAPIクラス
  */
-class UuidService {
+class UuidApi {
   /**
    * UUIDを生成して返す
    * @returns 生成されたUUID
@@ -81,13 +81,13 @@ async function main() {
     version: '1.0.0'
   });
   
-  const uuidService = new UuidService();
+  const uuidApi = new UuidApi();
   
   server.tool(
     'generate-uuid',
     {},
     async () => {
-      const uuid = uuidService.generateUuid();
+      const uuid = uuidApi.generateUuid();
       return {
         content: [{ type: 'text', text: uuid }]
       };
@@ -98,7 +98,7 @@ async function main() {
     'generate-uuids',
     { count: z.number().min(1).max(100) },
     async ({ count }) => {
-      const uuids = uuidService.generateUuids(count);
+      const uuids = uuidApi.generateUuids(count);
       return {
         content: [{ type: 'text', text: uuids.join('\n') }]
       };
@@ -109,7 +109,7 @@ async function main() {
     'detect-uuid-version',
     { uuid: z.string() },
     async ({ uuid }) => {
-      const versionInfo = uuidService.detectUuidVersion(uuid);
+      const versionInfo = uuidApi.detectUuidVersion(uuid);
       
       if (versionInfo.isValid) {
         return {
@@ -129,7 +129,7 @@ async function main() {
   const { uuid: inputUuid } = parseArgs();
   if (inputUuid) {
     console.log(`入力されたUUID: ${inputUuid}`);
-    const versionInfo = uuidService.detectUuidVersion(inputUuid);
+    const versionInfo = uuidApi.detectUuidVersion(inputUuid);
     
     if (versionInfo.isValid) {
       console.log(`UUIDの検証結果: 有効なUUID`);
