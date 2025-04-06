@@ -24,9 +24,7 @@ function parseArgs(): { uuid?: string } {
 /**
  * メイン関数
  */
-async function main() {
-  console.log('UUID MCPサーバーを起動しています...');
-  
+async function main() {  
   const server = new McpServer({
     name: 'uuid-server',
     version: '1.0.0'
@@ -69,30 +67,28 @@ async function main() {
             text: `有効なUUID（バージョン: ${versionInfo.version}）` 
           }]
         };
-      } else {
-        return {
-          content: [{ type: 'text', text: '無効なUUID' }]
-        };
-      }
+      } 
+      
+      return {
+        content: [{ type: 'text', text: '無効なUUID' }]
+      };
     }
   );
 
   const { uuid: inputUuid } = parseArgs();
   if (inputUuid) {
-    console.log(`入力されたUUID: ${inputUuid}`);
     const versionInfo = uuidApi.detectUuidVersion(inputUuid);
     
     if (versionInfo.isValid) {
-      console.log(`UUIDの検証結果: 有効なUUID`);
+      console.log("UUIDの検証結果: 有効なUUID");
       console.log(`UUIDのバージョン: ${versionInfo.version !== null ? versionInfo.version : '不明'}`);
     } else {
-      console.log(`UUIDの検証結果: 無効なUUID`);
+      console.log("UUIDの検証結果: 無効なUUID");
     }
     
     process.exit(0);
   }
 
-  console.log('MCPサーバーを起動します...');
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }
