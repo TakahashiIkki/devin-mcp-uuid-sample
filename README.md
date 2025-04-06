@@ -7,45 +7,26 @@ MCPサーバーと連携したUUID生成および検証のためのTypeScriptサ
 このプロジェクトは以下の機能を提供します：
 
 - UUIDの生成（UUID v4）
+    - 今、v4を勝手に作るようにしちゃっています. そのうち調整します.
 - UUIDのバージョン検出と検証
-- MCPサーバーとの接続（接続できない場合はローカルモードで動作）
+- MCPサーバーとの接続
 
 ## インストール
 
 ```bash
-# 依存関係をインストール
 npm install
 ```
 
 ## ビルド
 
 ```bash
-# プロジェクトをビルド
 npm run build
 ```
 
 ## 使用方法
 
-### UUIDの生成
-
-新しいUUIDを生成するには：
-
 ```bash
 npm start
-```
-
-### UUIDの検証
-
-既存のUUIDを検証するには：
-
-```bash
-npm start -- --uuid f47ac10b-58cc-4372-a567-0e02b2c3d479
-```
-
-または短い形式：
-
-```bash
-npm start -- -u f47ac10b-58cc-4372-a567-0e02b2c3d479
 ```
 
 ### 開発モード
@@ -55,6 +36,38 @@ TypeScriptを直接実行する開発モード：
 ```bash
 npm run dev
 ```
+
+## MCPクライアントとの接続
+
+- MCPクライアント（Devinなど）から接続するには、以下のいずれかの方法を使用します：
+    - stdio接続: MCPクライアントから直接このプロジェクトを子プロセスとして起動
+    - 外部プロセス接続: このプロジェクトを別プロセスとして起動し、MCPクライアントから接続
+
+###  提供されるMCPツール
+このMCPサーバーは以下のツールを提供します：
+
+1. generate-uuid: 単一のUUIDを生成
+1. generate-uuids: 指定された数のUUIDを生成（1〜100）
+1. detect-uuid-version: 指定されたUUIDの有効性とバージョンを検証
+
+### Memo: Claude Desktop からの設定
+
+"mcpServers" に以下を追加することで動作が確認できた
+
+```
+{
+  "mcpServers": {
+    "{some-mcp-name}": {
+      "command": "node",
+      "args": [
+        "/this/source/path/dist/src/index.js"
+      ]
+    }
+  }
+}
+```
+
+参考までに: https://x.com/ikkitang/status/1908895206709346329
 
 ### テスト
 
