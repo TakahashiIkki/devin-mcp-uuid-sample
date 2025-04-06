@@ -1,65 +1,35 @@
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { UuidApi } from '../service/UuidService.js';
+import { z } from 'zod';
+import { UuidApi } from '../service/UuidApi.js';
 
 /**
  * UUID生成と検証のためのMCPサーバークラス
  */
 export class UuidServer {
-  private server: Server;
+  private server: McpServer;
   private uuidApi: UuidApi;
 
   /**
    * UuidServerのコンストラクタ
    */
   constructor() {
-    this.server = new Server(
-      {
-        name: 'uuid-server',
-        version: '1.0.0'
-      },
-      {
-        capabilities: {
-          resources: {},
-          tools: {
-            'generate-uuid': {
-              description: 'UUIDを生成します',
-              parameters: {}
-            },
-            'generate-uuids': {
-              description: '複数のUUIDを生成します',
-              parameters: {
-                count: {
-                  type: 'number',
-                  description: '生成するUUIDの数'
-                }
-              }
-            },
-            'detect-uuid-version': {
-              description: 'UUIDのバージョンを判定します',
-              parameters: {
-                uuid: {
-                  type: 'string',
-                  description: '判定するUUID'
-                }
-              }
-            }
-          },
-          prompts: {}
-        }
-      }
-    );
+    this.server = new McpServer({
+      name: 'uuid-server',
+      version: '1.0.0'
+    });
     
     this.uuidApi = new UuidApi();
-    this.registerRequestHandlers();
+    this.registerTools();
   }
 
   /**
-   * リクエストハンドラーを登録する
+   * ツールを登録する
    */
-  private registerRequestHandlers() {
-    this.server.setRequestHandler(
-      { method: 'callTool', params: { name: 'generate-uuid' } },
+  private registerTools() {
+    this.server.tool(
+      'generate-uuid',
+      {},
       async () => {
         const uuid = this.uuidApi.generateUuid();
         return {
@@ -68,10 +38,10 @@ export class UuidServer {
       }
     );
 
-    this.server.setRequestHandler(
-      { method: 'callTool', params: { name: 'generate-uuids' } },
-      async (request) => {
-        const count = request.params?.params?.count as number || 1;
+    this.server.tool(
+      'generate-uuids',
+      { count: z.number().min(1).max(100) },
+      async ({ count }) => {
         const uuids = this.uuidApi.generateUuids(count);
         return {
           content: [{ type: 'text', text: uuids.join('\n') }]
@@ -79,10 +49,10 @@ export class UuidServer {
       }
     );
 
-    this.server.setRequestHandler(
-      { method: 'callTool', params: { name: 'detect-uuid-version' } },
-      async (request) => {
-        const uuid = request.params?.params?.uuid as string;
+    this.server.tool(
+      'detect-uuid-version',
+      { uuid: z.string() },
+      async ({ uuid }) => {
         const versionInfo = this.uuidApi.detectUuidVersion(uuid);
         
         if (versionInfo.isValid) {
